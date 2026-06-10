@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: base_spring_boot
+  datasource:
+    url: jdbc:mysql://localhost:3306/base_core?createDatabaseIfNotExist=true
+    username: root
+    password: Phuchb24@
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+jwt:
+  secret:
+    key: daylachuoimahoabimatrikkei0987654321dacbietracroi
+  expired:
+    access: 864000
