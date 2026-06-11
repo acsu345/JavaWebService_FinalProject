@@ -24,6 +24,9 @@ public class JwtUtils
     @Value("${jwt.expired.access}")
     private Long EXPIRED_ACCESS;
 
+    @Value("${jwt.expired.refresh}")
+    private Long EXPIRED_REFRESH;
+
     public String extractUsername(String token)
     {
         return extractClaim(token, Claims::getSubject);
@@ -65,18 +68,24 @@ public class JwtUtils
     public String generateToken(String username)
     {
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, username);
+        return createToken(claims, username, EXPIRED_ACCESS);
+    }
+
+    public String generateRefreshToken(String username)
+    {
+        Map<String, Object> claims = new HashMap<>();
+        return createToken(claims, username, EXPIRED_REFRESH);
     }
 
 
-    private String createToken(Map<String, Object> claims, String username)
+    private String createToken(Map<String, Object> claims, String username, Long expired)
     {
 
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRED_ACCESS))
+                .setExpiration(new Date(System.currentTimeMillis() + expired))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
     }

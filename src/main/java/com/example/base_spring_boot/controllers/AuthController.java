@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
@@ -50,4 +52,16 @@ public class AuthController
         );
     }
 
+    @PostMapping("/refresh")
+    public ResponseEntity<?> handleRefreshToken(@RequestBody Map<String, String> req)
+    {
+        String refreshToken = req.get("refreshToken");
+        return ResponseEntity.ok(
+                DataRes.builder()
+                        .status(HttpStatus.OK)
+                        .code(200)
+                        .data(authService.refreshToken(refreshToken))
+                        .build()
+        );
+    }
 }

@@ -29,4 +29,7 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles;
+
+    @Column(name = "refresh_token")
+    private String refreshToken;
 }

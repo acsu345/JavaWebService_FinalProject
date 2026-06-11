@@ -10,5 +10,5 @@ public interface IAuthService
     void register(RegisterReq req);
 
     JwtRes login(LoginReq req);
-
+    JwtRes refreshToken(String refreshToken);
 }

@@ -19,3 +19,4 @@ jwt:
     key: daylachuoimahoabimatrikkei0987654321dacbietracroi
   expired:
     access: 864000
+    refresh: 604800000

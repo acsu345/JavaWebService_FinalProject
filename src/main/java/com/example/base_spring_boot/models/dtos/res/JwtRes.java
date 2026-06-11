@@ -13,6 +13,7 @@ import java.util.Set;
 @Builder
 public class JwtRes {
     private String accessToken;
+    private String refreshToken;
     @Builder.Default
     private final String type = "Bearer";
     private Set<String> roles;

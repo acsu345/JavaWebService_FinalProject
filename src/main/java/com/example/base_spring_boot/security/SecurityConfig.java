@@ -43,7 +43,7 @@ public class SecurityConfig
                 .cors(cf -> cf.configurationSource(request ->
                 {
                     CorsConfiguration config = new CorsConfiguration();
-                    config.setAllowedOrigins(List.of("http://localhost:8080")); // phụ thuộc vào port clents
+                    config.setAllowedOrigins(List.of("http://localhost:8080")); // phụ thuộc vào port clients
                     config.setAllowedMethods(List.of("*"));
                     config.setAllowCredentials(true);
                     config.setAllowedHeaders(List.of("*"));

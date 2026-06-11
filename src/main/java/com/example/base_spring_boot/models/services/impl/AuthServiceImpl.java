@@ -63,11 +63,44 @@ public class AuthServiceImpl implements IAuthService
         }
 
         MyUserDetails userDetails = (MyUserDetails) authentication.getPrincipal();
+        User user = userDetails.getUser();
 
-        assert userDetails != null;
+        String accessToken = jwtUtils.generateToken(user.getUsername());
+        String refreshToken = jwtUtils.generateRefreshToken(user.getUsername());
+
+        user.setRefreshToken(refreshToken);
+        userRepository.save(user);
+
         return JwtRes.builder()
-                .accessToken(jwtUtils.generateToken(userDetails.getUsername()))
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .roles(userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet()))
+                .build();
+    }
+
+    @Override
+    public JwtRes refreshToken(String refreshToken)
+    {
+        String username = jwtUtils.extractUsername(refreshToken);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new HttpBadRequestException("Invalid refresh token"));
+
+        if (user.getRefreshToken() == null || !user.getRefreshToken().equals(refreshToken))
+        {
+            throw new HttpBadRequestException("Invalid refresh token");
+        }
+
+        // Tạo bộ đôi token mới (Rotation)
+        String newAccessToken = jwtUtils.generateToken(username);
+        String newRefreshToken = jwtUtils.generateRefreshToken(username);
+
+        user.setRefreshToken(newRefreshToken);
+        userRepository.save(user);
+
+        return JwtRes.builder()
+                .accessToken(newAccessToken)
+                .refreshToken(newRefreshToken)
+                .roles(user.getRoles().stream().map(role -> role.getRoleName().name()).collect(Collectors.toSet()))
                 .build();
     }
 
