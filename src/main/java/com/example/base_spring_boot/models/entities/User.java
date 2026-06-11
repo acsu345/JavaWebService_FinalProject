@@ -22,6 +22,17 @@ public class User {
     private String username;
     @Column(name = "password")
     private String password;
+
+    @Column(name = "phone")
+    private String phone;
+
+    @Column(name = "email")
+    private String email;
+
+    @Column(name = "enabled")
+    @Builder.Default
+    private boolean enabled = true;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_role",

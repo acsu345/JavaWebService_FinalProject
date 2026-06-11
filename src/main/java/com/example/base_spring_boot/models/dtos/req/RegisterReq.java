@@ -17,4 +17,6 @@ public class RegisterReq {
     private String username;
     @NotBlank(message = "password must be not empty")
     private String password;
+    private String phone;
+    private String email;
 }

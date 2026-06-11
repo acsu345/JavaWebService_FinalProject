@@ -15,5 +15,8 @@ public class UserRes {
     private Long id;
     private String fullName;
     private String username;
+    private String phone;
+    private String email;
+    private boolean enabled;
     private Set<String> roles;
 }

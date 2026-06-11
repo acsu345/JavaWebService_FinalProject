@@ -44,6 +44,8 @@ public class AuthServiceImpl implements IAuthService
                 .fullName(req.getFullName())
                 .username(req.getUsername())
                 .password(passwordEncoder.encode(req.getPassword()))
+                .phone(req.getPhone())
+                .email(req.getEmail())
                 .roles(roles)
                 .build();
         userRepository.save(user);
