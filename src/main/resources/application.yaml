@@ -13,6 +13,10 @@ spring:
         format_sql: true
         show_sql: true
         dialect: org.hibernate.dialect.MySQL8Dialect
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 100MB
 
 jwt:
   secret:
@@ -20,3 +24,9 @@ jwt:
   expired:
     access: 864000
     refresh: 604800000
+
+cloudinary:
+  cloud-name: Root
+  api-key: 973697993839398
+  api-secret: Qd9mnuWKGiQ4p0fd8YPVVd4B2jQ
+

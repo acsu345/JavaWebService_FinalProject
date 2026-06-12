@@ -3,6 +3,9 @@ package com.example.base_spring_boot.models.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "courts")
 @NoArgsConstructor
@@ -25,4 +28,8 @@ public class Court {
     private Double pricePerHour;
 
     private String status; // Ví dụ: AVAILABLE, MAINTENANCE
+
+    @OneToMany(mappedBy = "court", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<CourtImage> images = new ArrayList<>();
 }

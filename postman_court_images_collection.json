@@ -1,0 +1,157 @@
+
+{
+  "info": {
+    "_postman_id": "court-images-collection",
+    "name": "FR-09: Court Images Upload API",
+    "description": "API collection for uploading and managing court images",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Upload Single Image",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "file",
+              "type": "file",
+              "src": []
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/court-images/upload/1",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "court-images", "upload", "1"]
+        },
+        "description": "Upload a single image to a court. Requires MANAGER or ADMIN role."
+      }
+    },
+    {
+      "name": "Upload Multiple Images",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "files",
+              "type": "file",
+              "src": []
+            },
+            {
+              "key": "files",
+              "type": "file",
+              "src": []
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/court-images/upload-multiple/1",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "court-images", "upload-multiple", "1"]
+        },
+        "description": "Upload multiple images to a court (max 10 files). Requires MANAGER or ADMIN role."
+      }
+    },
+    {
+      "name": "Get Court Images",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/v1/court-images/court/1",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "court-images", "court", "1"]
+        },
+        "description": "Get all images for a specific court. No authentication required."
+      }
+    },
+    {
+      "name": "Delete Image",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v1/court-images/1",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "court-images", "1"]
+        },
+        "description": "Delete a specific image by ID. Requires MANAGER or ADMIN role."
+      }
+    },
+    {
+      "name": "Update Image Display Order",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v1/court-images/1/order?order=2",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "court-images", "1", "order"],
+          "query": [
+            {
+              "key": "order",
+              "value": "2"
+            }
+          ]
+        },
+        "description": "Update the display order of an image. Requires MANAGER or ADMIN role."
+      }
+    },
+    {
+      "name": "Get Court with Images",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/v1/courts/1",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "courts", "1"]
+        },
+        "description": "Get court details including all associated images."
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "your_jwt_token_here",
+      "type": "string"
+    }
+  ]
+}
+

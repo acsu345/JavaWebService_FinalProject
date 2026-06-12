@@ -1,14 +1,18 @@
 package com.example.base_spring_boot.models.services.impl;
 
 import com.example.base_spring_boot.exceptions.HttpNotFoundException;
+import com.example.base_spring_boot.models.dtos.res.CourtImageRes;
 import com.example.base_spring_boot.models.dtos.res.CourtRes;
 import com.example.base_spring_boot.models.entities.Court;
+import com.example.base_spring_boot.models.entities.CourtImage;
 import com.example.base_spring_boot.models.repositories.ICourtRepository;
 import com.example.base_spring_boot.models.services.ICourtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +38,22 @@ public class CourtServiceImpl implements ICourtService {
                 .courtTypeName(court.getCourtType().getName())
                 .pricePerHour(court.getPricePerHour())
                 .status(court.getStatus())
+                .images(court.getImages().stream()
+                        .map(this::mapToCourtImageRes)
+                        .collect(Collectors.toList()))
+                .build();
+    }
+
+    private CourtImageRes mapToCourtImageRes(CourtImage img) {
+        return CourtImageRes.builder()
+                .id(img.getId())
+                .imageUrl(img.getImageUrl())
+                .displayOrder(img.getDisplayOrder())
+                .uploadedAt(img.getUploadedAt())
                 .build();
     }
 }
+
+
+
+

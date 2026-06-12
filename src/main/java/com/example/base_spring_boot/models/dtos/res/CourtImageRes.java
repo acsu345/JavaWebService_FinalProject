@@ -5,19 +5,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Builder
-public class CourtRes {
+public class CourtImageRes {
     private Long id;
-    private String courtName;
-    private String courtTypeName;
-    private Double pricePerHour;
-    private String status;
-    private List<CourtImageRes> images;
+    private String imageUrl;
+    private Integer displayOrder;
+    private LocalDateTime uploadedAt;
 }
-
 
