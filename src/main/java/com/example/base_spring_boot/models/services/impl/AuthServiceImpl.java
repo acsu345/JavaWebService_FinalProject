@@ -38,6 +38,10 @@ public class AuthServiceImpl implements IAuthService
     @Override
     public void register(RegisterReq req)
     {
+        if (userRepository.findByUsername(req.getUsername()).isPresent()) {
+            throw new HttpBadRequestException("Username is already taken");
+        }
+
         Set<Role> roles = new HashSet<>();
         roles.add(roleService.findByRoleName(RoleName.ROLE_CUSTOMER));
         User user = User.builder()

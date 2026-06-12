@@ -11,11 +11,24 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+
 @RestController
 @RequestMapping("/api/v1/customer/bookings")
 @RequiredArgsConstructor
 public class CustomerBookingController {
     private final IBookingService bookingService;
+
+    @GetMapping("/available-slots")
+    public ResponseEntity<?> getAvailableSlots(@RequestParam Long courtId, @RequestParam LocalDate date) {
+        return ResponseEntity.ok(
+                DataRes.builder()
+                        .status(HttpStatus.OK)
+                        .code(200)
+                        .data(bookingService.getAvailableSlots(courtId, date))
+                        .build()
+        );
+    }
 
     @PostMapping
     public ResponseEntity<?> createBooking(@Valid @RequestBody BookingReq req) {
@@ -35,6 +48,18 @@ public class CustomerBookingController {
                         .status(HttpStatus.OK)
                         .code(200)
                         .data(bookingService.getMyBookings(pageable))
+                        .build()
+        );
+    }
+
+    @GetMapping("/history")
+    public ResponseEntity<?> getBookingHistory() {
+        return ResponseEntity.ok(
+                DataRes.builder()
+                        .status(HttpStatus.OK)
+                        .code(200)
+                        .message("Booking history retrieved successfully")
+                        .data(bookingService.getBookingHistory())
                         .build()
         );
     }

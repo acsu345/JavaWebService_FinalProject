@@ -1,5 +1,6 @@
 package com.example.base_spring_boot.security.jwt;
 
+import com.example.base_spring_boot.models.services.IJwtBlacklistService;
 import com.example.base_spring_boot.security.principal.MyUserDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -24,6 +25,7 @@ public class JwtTokenFilter extends OncePerRequestFilter
 {
     private final MyUserDetailsService userDetailsService;
     private final JwtUtils jwtUtils;
+    private final IJwtBlacklistService jwtBlacklistService;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException
@@ -33,6 +35,12 @@ public class JwtTokenFilter extends OncePerRequestFilter
             String token = getTokenFromRequest(request);
             if (token != null)
             {
+                if (jwtBlacklistService.isTokenBlacklisted(token)) {
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.getWriter().write("Token is blacklisted");
+                    return;
+                }
+
                 String username = jwtUtils.extractUsername(token);
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
                 if (jwtUtils.validateToken(token, userDetails) )

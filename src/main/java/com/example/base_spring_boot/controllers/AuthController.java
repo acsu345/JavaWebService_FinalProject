@@ -4,6 +4,8 @@ import com.example.base_spring_boot.models.dtos.req.LoginReq;
 import com.example.base_spring_boot.models.dtos.req.RegisterReq;
 import com.example.base_spring_boot.models.dtos.wrapper.DataRes;
 import com.example.base_spring_boot.models.services.IAuthService;
+import com.example.base_spring_boot.models.services.IJwtBlacklistService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,6 +20,7 @@ import java.util.Map;
 public class AuthController
 {
     private final IAuthService authService;
+    private final IJwtBlacklistService jwtBlacklistService;
 
     /**
      * @param req LoginReq
@@ -61,6 +64,23 @@ public class AuthController
                         .status(HttpStatus.OK)
                         .code(200)
                         .data(authService.refreshToken(refreshToken))
+                        .build()
+        );
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> handleLogout(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            jwtBlacklistService.blacklistToken(token);
+        }
+        return ResponseEntity.ok(
+                DataRes.builder()
+                        .status(HttpStatus.OK)
+                        .code(200)
+                        .message("Logout successfully")
+                        .data(null)
                         .build()
         );
     }

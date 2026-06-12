@@ -18,9 +18,9 @@ public class User {
     private Long id;
     @Column(name = "full_name")
     private String fullName;
-    @Column(name = "username")
+    @Column(name = "username", unique = true, nullable = false)
     private String username;
-    @Column(name = "password")
+    @Column(name = "password", nullable = false)
     private String password;
 
     @Column(name = "phone")
@@ -32,6 +32,18 @@ public class User {
     @Column(name = "enabled")
     @Builder.Default
     private boolean enabled = true;
+
+    @Column(name = "active")
+    @Builder.Default
+    private boolean active = true;
+
+    @Column(name = "created_at", updatable = false)
+    private java.time.LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = java.time.LocalDateTime.now();
+    }
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

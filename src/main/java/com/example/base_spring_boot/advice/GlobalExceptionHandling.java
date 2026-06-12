@@ -1,6 +1,7 @@
 package com.example.base_spring_boot.advice;
 
 import com.example.base_spring_boot.exceptions.HttpBadRequestException;
+import com.example.base_spring_boot.exceptions.HttpConflictException;
 import com.example.base_spring_boot.exceptions.HttpNotFoundException;
 import com.example.base_spring_boot.models.dtos.wrapper.DataRes;
 import org.springframework.http.HttpStatus;
@@ -96,6 +97,22 @@ public class GlobalExceptionHandling
                         .data(ex.getMessage())
                         .code(HttpStatus.NOT_FOUND.value())
                         .status(HttpStatus.NOT_FOUND)
+                        .build()
+        );
+    }
+
+    /**
+     * @param ex HttpConflictException
+     * @apiNote handle exception conflict (409)
+     * */
+    @ExceptionHandler(HttpConflictException.class)
+    public ResponseEntity<?> handleHttpConflict(HttpConflictException ex)
+    {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                DataRes.builder()
+                        .data(ex.getMessage())
+                        .code(HttpStatus.CONFLICT.value())
+                        .status(HttpStatus.CONFLICT)
                         .build()
         );
     }
