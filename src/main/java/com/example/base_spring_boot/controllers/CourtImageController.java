@@ -1,5 +1,7 @@
 package com.example.base_spring_boot.controllers;
 
+import com.example.base_spring_boot.models.dtos.req.CourtImageUrlReq;
+import com.example.base_spring_boot.models.dtos.req.CourtImageUrlsReq;
 import com.example.base_spring_boot.models.dtos.wrapper.DataRes;
 import com.example.base_spring_boot.models.services.ICourtImageService;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +39,60 @@ public class CourtImageController {
                     .build());
         } catch (Exception e) {
             log.error("Error uploading image", e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(DataRes.builder()
+                            .status(HttpStatus.BAD_REQUEST)
+                            .code(400)
+                            .message(e.getMessage())
+                            .build());
+        }
+    }
+
+    /**
+     * Upload an image to a court via URL
+     * Only MANAGER and ADMIN can upload images
+     */
+    @PostMapping("/upload-link/{courtId}")
+    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
+    public ResponseEntity<?> uploadImageFromUrl(
+            @PathVariable Long courtId,
+            @RequestBody CourtImageUrlReq req) {
+        try {
+            return ResponseEntity.ok(DataRes.builder()
+                    .status(HttpStatus.OK)
+                    .code(200)
+                    .message("Image uploaded successfully from URL")
+                    .data(courtImageService.uploadImageFromUrl(courtId, req))
+                    .build());
+        } catch (Exception e) {
+            log.error("Error uploading image from URL", e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(DataRes.builder()
+                            .status(HttpStatus.BAD_REQUEST)
+                            .code(400)
+                            .message(e.getMessage())
+                            .build());
+        }
+    }
+
+    /**
+     * Upload multiple images to a court via URLs
+     * Only MANAGER and ADMIN can upload images
+     */
+    @PostMapping("/upload-multiple-links/{courtId}")
+    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
+    public ResponseEntity<?> uploadMultipleImagesFromUrls(
+            @PathVariable Long courtId,
+            @RequestBody CourtImageUrlsReq req) {
+        try {
+            return ResponseEntity.ok(DataRes.builder()
+                    .status(HttpStatus.OK)
+                    .code(200)
+                    .message("Images uploaded successfully from URLs")
+                    .data(courtImageService.uploadMultipleImagesFromUrls(courtId, req))
+                    .build());
+        } catch (Exception e) {
+            log.error("Error uploading images from URLs", e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(DataRes.builder()
                             .status(HttpStatus.BAD_REQUEST)

@@ -4,6 +4,8 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.example.base_spring_boot.exceptions.HttpBadRequestException;
 import com.example.base_spring_boot.exceptions.HttpNotFoundException;
+import com.example.base_spring_boot.models.dtos.req.CourtImageUrlReq;
+import com.example.base_spring_boot.models.dtos.req.CourtImageUrlsReq;
 import com.example.base_spring_boot.models.dtos.res.CourtImageRes;
 import com.example.base_spring_boot.models.entities.Court;
 import com.example.base_spring_boot.models.entities.CourtImage;
@@ -36,6 +38,106 @@ public class CourtImageServiceImpl implements ICourtImageService {
         List<MultipartFile> files = List.of(file);
         return uploadMultipleImages(courtId, files).stream().findFirst()
                 .orElseThrow(() -> new HttpBadRequestException("Failed to upload image"));
+    }
+
+    @Override
+    public CourtImageRes uploadImageFromUrl(Long courtId, CourtImageUrlReq req) {
+        // Verify court exists
+        Court court = courtRepository.findById(courtId)
+                .orElseThrow(() -> new HttpNotFoundException("Court not found with id: " + courtId));
+
+        if (req.getImageUrl() == null || req.getImageUrl().isEmpty()) {
+            throw new HttpBadRequestException("Image URL is required");
+        }
+
+        // Get current image count
+        int currentImageCount = courtImageRepository.countByCourtId(courtId);
+        if (currentImageCount >= 50) {
+            throw new HttpBadRequestException("Court cannot have more than 50 images total");
+        }
+
+        try {
+            // Upload to Cloudinary from URL
+            @SuppressWarnings("unchecked")
+            Map<String, Object> uploadResult = cloudinary.uploader().upload(req.getImageUrl(),
+                    ObjectUtils.asMap(
+                            "folder", "court_images/court_" + court.getId(),
+                            "resource_type", "auto",
+                            "public_id", "image_" + System.currentTimeMillis()
+                    ));
+
+            String imageUrl = (String) uploadResult.get("secure_url");
+            String publicId = (String) uploadResult.get("public_id");
+
+            // Save to database
+            CourtImage courtImage = CourtImage.builder()
+                    .court(court)
+                    .imageUrl(imageUrl)
+                    .publicId(publicId)
+                    .displayOrder(req.getDisplayOrder() != null ? req.getDisplayOrder() : currentImageCount + 1)
+                    .build();
+
+            courtImage = courtImageRepository.save(courtImage);
+            log.info("Successfully uploaded image from URL for court: {}", court.getId());
+
+            return mapToCourtImageRes(courtImage);
+        } catch (IOException e) {
+            log.error("Error uploading image from URL to Cloudinary", e);
+            throw new HttpBadRequestException("Failed to upload image from URL: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public List<CourtImageRes> uploadMultipleImagesFromUrls(Long courtId, CourtImageUrlsReq req) {
+        // Verify court exists
+        Court court = courtRepository.findById(courtId)
+                .orElseThrow(() -> new HttpNotFoundException("Court not found with id: " + courtId));
+
+        if (req.getImages() == null || req.getImages().isEmpty()) {
+            throw new HttpBadRequestException("At least one image URL is required");
+        }
+
+        if (req.getImages().size() > 10) {
+            throw new HttpBadRequestException("Maximum 10 image URLs per upload");
+        }
+
+        // Get current image count
+        int currentImageCount = courtImageRepository.countByCourtId(courtId);
+        if (currentImageCount + req.getImages().size() > 50) {
+            throw new HttpBadRequestException("Court cannot have more than 50 images total");
+        }
+
+        return req.getImages().stream()
+                .map(imageReq -> {
+                    try {
+                        // Upload to Cloudinary from URL
+                        @SuppressWarnings("unchecked")
+                        Map<String, Object> uploadResult = cloudinary.uploader().upload(imageReq.getImageUrl(),
+                                ObjectUtils.asMap(
+                                        "folder", "court_images/court_" + court.getId(),
+                                        "resource_type", "auto",
+                                        "public_id", "image_" + System.currentTimeMillis() + "_" + req.getImages().indexOf(imageReq)
+                                ));
+
+                        String imageUrl = (String) uploadResult.get("secure_url");
+                        String publicId = (String) uploadResult.get("public_id");
+
+                        // Save to database
+                        CourtImage courtImage = CourtImage.builder()
+                                .court(court)
+                                .imageUrl(imageUrl)
+                                .publicId(publicId)
+                                .displayOrder(imageReq.getDisplayOrder() != null ? imageReq.getDisplayOrder() : currentImageCount + req.getImages().indexOf(imageReq) + 1)
+                                .build();
+
+                        courtImage = courtImageRepository.save(courtImage);
+                        return mapToCourtImageRes(courtImage);
+                    } catch (IOException e) {
+                        log.error("Error uploading image from URL: {}", imageReq.getImageUrl(), e);
+                        throw new HttpBadRequestException("Failed to upload image from URL: " + imageReq.getImageUrl());
+                    }
+                })
+                .collect(Collectors.toList());
     }
 
     @Override

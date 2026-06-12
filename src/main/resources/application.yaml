@@ -26,7 +26,7 @@ jwt:
     refresh: 604800000
 
 cloudinary:
-  cloud-name: Root
+  cloud-name: acsu345
   api-key: 973697993839398
   api-secret: Qd9mnuWKGiQ4p0fd8YPVVd4B2jQ
 

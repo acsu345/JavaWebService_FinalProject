@@ -1,5 +1,6 @@
 package com.example.base_spring_boot.models.dtos.req;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,5 +19,7 @@ public class RegisterReq {
     @NotBlank(message = "password must be not empty")
     private String password;
     private String phone;
+    @NotBlank(message = "email must be not empty")
+    @Email(message = "email must be a valid email address")
     private String email;
 }

@@ -11,6 +11,7 @@ import java.util.Optional;
 @Repository
 public interface IUserRepository extends JpaRepository<User,Long> {
     Optional<User> findByUsername(String username);
+    boolean existsByEmail(String email);
 
     @Query("SELECT u FROM User u WHERE u.username LIKE %:keyword% OR u.fullName LIKE %:keyword%")
     Page<User> searchUsers(String keyword, Pageable pageable);

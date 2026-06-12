@@ -1,5 +1,7 @@
 package com.example.base_spring_boot.models.services;
 
+import com.example.base_spring_boot.models.dtos.req.CourtImageUrlReq;
+import com.example.base_spring_boot.models.dtos.req.CourtImageUrlsReq;
 import com.example.base_spring_boot.models.dtos.res.CourtImageRes;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,6 +16,24 @@ public interface ICourtImageService {
      * @return the uploaded image response
      */
     CourtImageRes uploadImage(Long courtId, MultipartFile file);
+
+    /**
+     * Upload an image from a URL to a court
+     *
+     * @param courtId ID of the court
+     * @param req request containing image URL
+     * @return the uploaded image response
+     */
+    CourtImageRes uploadImageFromUrl(Long courtId, CourtImageUrlReq req);
+
+    /**
+     * Upload multiple images from URLs to a court
+     *
+     * @param courtId ID of the court
+     * @param req request containing list of image URLs
+     * @return list of uploaded image responses
+     */
+    List<CourtImageRes> uploadMultipleImagesFromUrls(Long courtId, CourtImageUrlsReq req);
 
     /**
      * Upload multiple images to a court

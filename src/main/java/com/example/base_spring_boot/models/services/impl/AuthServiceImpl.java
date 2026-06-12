@@ -42,6 +42,10 @@ public class AuthServiceImpl implements IAuthService
             throw new HttpBadRequestException("Username is already taken");
         }
 
+        if (userRepository.existsByEmail(req.getEmail())) {
+            throw new HttpBadRequestException("Email is already registered");
+        }
+
         Set<Role> roles = new HashSet<>();
         roles.add(roleService.findByRoleName(RoleName.ROLE_CUSTOMER));
         User user = User.builder()
