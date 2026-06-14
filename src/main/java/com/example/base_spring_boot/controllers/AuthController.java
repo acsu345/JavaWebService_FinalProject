@@ -1,7 +1,9 @@
 package com.example.base_spring_boot.controllers;
 
+import com.example.base_spring_boot.models.dtos.req.ForgotPasswordReq;
 import com.example.base_spring_boot.models.dtos.req.LoginReq;
 import com.example.base_spring_boot.models.dtos.req.RegisterReq;
+import com.example.base_spring_boot.models.dtos.req.ResetPasswordReq;
 import com.example.base_spring_boot.models.dtos.wrapper.DataRes;
 import com.example.base_spring_boot.models.services.IAuthService;
 import com.example.base_spring_boot.models.services.IJwtBlacklistService;
@@ -31,8 +33,8 @@ public class AuthController
     {
         return ResponseEntity.status(HttpStatus.OK).body(
                 DataRes.builder()
-                        .status(HttpStatus.OK)
-                        .code(200)
+                        .success(true)
+                        .message("Login successfully")
                         .data(authService.login(req))
                         .build()
         );
@@ -48,9 +50,9 @@ public class AuthController
         authService.register(req);
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 DataRes.builder()
-                        .status(HttpStatus.CREATED)
-                        .code(201)
-                        .data("Register successfully")
+                        .success(true)
+                        .message("Register successfully")
+                        .data(null)
                         .build()
         );
     }
@@ -61,8 +63,8 @@ public class AuthController
         String refreshToken = req.get("refreshToken");
         return ResponseEntity.ok(
                 DataRes.builder()
-                        .status(HttpStatus.OK)
-                        .code(200)
+                        .success(true)
+                        .message("Token refreshed")
                         .data(authService.refreshToken(refreshToken))
                         .build()
         );
@@ -77,11 +79,30 @@ public class AuthController
         }
         return ResponseEntity.ok(
                 DataRes.builder()
-                        .status(HttpStatus.OK)
-                        .code(200)
+                        .success(true)
                         .message("Logout successfully")
                         .data(null)
                         .build()
         );
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordReq req) {
+        authService.forgotPassword(req);
+        return ResponseEntity.ok(DataRes.builder()
+                .success(true)
+                .message("OTP has been sent to your email")
+                .data(null)
+                .build());
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordReq req) {
+        authService.resetPassword(req);
+        return ResponseEntity.ok(DataRes.builder()
+                .success(true)
+                .message("Password reset successfully")
+                .data(null)
+                .build());
     }
 }

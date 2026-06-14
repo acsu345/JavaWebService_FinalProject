@@ -12,8 +12,7 @@ import org.springframework.http.HttpStatus;
 @Builder
 public class DataRes<T>
 {
-    private HttpStatus status;
-    private int code;
+    private boolean success;
     private String message;
     private T data;
 }

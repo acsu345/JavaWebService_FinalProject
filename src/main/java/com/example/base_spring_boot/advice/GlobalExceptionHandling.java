@@ -3,134 +3,91 @@ package com.example.base_spring_boot.advice;
 import com.example.base_spring_boot.exceptions.HttpBadRequestException;
 import com.example.base_spring_boot.exceptions.HttpConflictException;
 import com.example.base_spring_boot.exceptions.HttpNotFoundException;
-import com.example.base_spring_boot.models.dtos.wrapper.DataRes;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandling
 {
-    /**
-     * @param ex MethodArgumentNotValidException
-     * @apiNote handle valid exception for validation (400)
-     */
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ErrorResponse {
+        private LocalDateTime timestamp;
+        private int status;
+        private String error;
+        private String message;
+        private String path;
+    }
+
+    private ResponseEntity<ErrorResponse> buildErrorResponse(HttpStatus status, String message, WebRequest request) {
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(status.value())
+                .error(status.getReasonPhrase())
+                .message(message)
+                .path(request.getDescription(false).replace("uri=", ""))
+                .build();
+        return new ResponseEntity<>(errorResponse, status);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<?> handleValidException(MethodArgumentNotValidException ex)
+    public ResponseEntity<ErrorResponse> handleValidException(MethodArgumentNotValidException ex, WebRequest request)
     {
         Map<String, String> errors = new HashMap<>();
         ex.getFieldErrors().forEach(err -> errors.put(err.getField(), err.getDefaultMessage()));
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                DataRes.builder()
-                        .data(errors)
-                        .code(HttpStatus.BAD_REQUEST.value())
-                        .status(HttpStatus.BAD_REQUEST)
-                        .build()
-        );
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, errors.toString(), request);
     }
 
-    /**
-     * @param ex NoResourceFoundException
-     * @apiNote handle exception not found resource (404)
-     * */
     @ExceptionHandler(NoResourceFoundException.class)
-    public ResponseEntity<?> handleNoResourceFoundException(NoResourceFoundException ex)
+    public ResponseEntity<ErrorResponse> handleNoResourceFoundException(NoResourceFoundException ex, WebRequest request)
     {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                DataRes.builder()
-                        .data(ex.getMessage())
-                        .code(HttpStatus.NOT_FOUND.value())
-                        .status(HttpStatus.NOT_FOUND)
-                        .build()
-        );
+        return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request);
     }
 
-    /**
-     * @param ex UsernameNotFoundException
-     * @apiNote handle username not found exception
-     * */
     @ExceptionHandler(UsernameNotFoundException.class)
-    public ResponseEntity<?> handleUsernameNotFoundException(UsernameNotFoundException ex)
+    public ResponseEntity<ErrorResponse> handleUsernameNotFoundException(UsernameNotFoundException ex, WebRequest request)
     {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                DataRes.builder()
-                        .data(ex.getMessage())
-                        .code(HttpStatus.NOT_FOUND.value())
-                        .status(HttpStatus.NOT_FOUND)
-                        .build()
-        );
+        return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request);
     }
 
-    /**
-     * @param ex HttpBadRequest
-     * @apiNote handle exception bad request (400)
-     * */
     @ExceptionHandler(HttpBadRequestException.class)
-    public ResponseEntity<?> handleHttpBadReqeust(HttpBadRequestException ex)
+    public ResponseEntity<ErrorResponse> handleHttpBadReqeust(HttpBadRequestException ex, WebRequest request)
     {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                DataRes.builder()
-                        .data(ex.getMessage())
-                        .code(HttpStatus.BAD_REQUEST.value())
-                        .status(HttpStatus.BAD_REQUEST)
-                        .build()
-        );
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
     }
 
-    /**
-     * @param ex HttpNotFound
-     * @apiNote handle exception not found (404)
-     * */
     @ExceptionHandler(HttpNotFoundException.class)
-    public ResponseEntity<?> handleHttpNotFound(HttpNotFoundException ex)
+    public ResponseEntity<ErrorResponse> handleHttpNotFound(HttpNotFoundException ex, WebRequest request)
     {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                DataRes.builder()
-                        .data(ex.getMessage())
-                        .code(HttpStatus.NOT_FOUND.value())
-                        .status(HttpStatus.NOT_FOUND)
-                        .build()
-        );
+        return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request);
     }
 
-    /**
-     * @param ex HttpConflictException
-     * @apiNote handle exception conflict (409)
-     * */
     @ExceptionHandler(HttpConflictException.class)
-    public ResponseEntity<?> handleHttpConflict(HttpConflictException ex)
+    public ResponseEntity<ErrorResponse> handleHttpConflict(HttpConflictException ex, WebRequest request)
     {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(
-                DataRes.builder()
-                        .data(ex.getMessage())
-                        .code(HttpStatus.CONFLICT.value())
-                        .status(HttpStatus.CONFLICT)
-                        .build()
-        );
+        return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage(), request);
     }
 
-    /**
-     * @param ex Exception
-     * @apiNote handle all other exceptions (500)
-     */
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleGeneralException(Exception ex)
+    public ResponseEntity<ErrorResponse> handleGeneralException(Exception ex, WebRequest request)
     {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                DataRes.builder()
-                        .data(ex.getMessage())
-                        .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .build()
-        );
+        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), request);
     }
-
 }

@@ -1,6 +1,8 @@
 package com.example.base_spring_boot.models.services.impl;
 
+import com.example.base_spring_boot.exceptions.HttpBadRequestException;
 import com.example.base_spring_boot.exceptions.HttpNotFoundException;
+import com.example.base_spring_boot.models.dtos.req.ChangePasswordReq;
 import com.example.base_spring_boot.models.dtos.req.UserUpdateReq;
 import com.example.base_spring_boot.models.dtos.res.UserRes;
 import com.example.base_spring_boot.models.entities.Role;
@@ -11,6 +13,8 @@ import com.example.base_spring_boot.models.services.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +26,7 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements IUserService {
     private final IUserRepository userRepository;
     private final IRoleService roleService;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public Page<UserRes> findAll(Pageable pageable) {
@@ -54,6 +59,20 @@ public class UserServiceImpl implements IUserService {
         user.setRoles(roles);
         
         return mapToUserRes(userRepository.save(user));
+    }
+
+    @Override
+    public void changePassword(ChangePasswordReq req) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new HttpNotFoundException("User not found"));
+
+        if (!passwordEncoder.matches(req.getOldPassword(), user.getPassword())) {
+            throw new HttpBadRequestException("Invalid old password");
+        }
+
+        user.setPassword(passwordEncoder.encode(req.getNewPassword()));
+        userRepository.save(user);
     }
 
     @Override
