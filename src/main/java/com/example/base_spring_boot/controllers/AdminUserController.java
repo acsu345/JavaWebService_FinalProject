@@ -22,6 +22,8 @@ public class AdminUserController {
         return ResponseEntity.ok(DataRes.builder()
                 .status(HttpStatus.OK)
                 .code(200)
+                .success(true)
+                .message("Get all users successfully")
                 .data(userService.findAll(pageable))
                 .build());
     }
@@ -31,6 +33,8 @@ public class AdminUserController {
         return ResponseEntity.ok(DataRes.builder()
                 .status(HttpStatus.OK)
                 .code(200)
+                .success(true)
+                .message("Search users successfully")
                 .data(userService.search(keyword, pageable))
                 .build());
     }
@@ -40,6 +44,8 @@ public class AdminUserController {
         return ResponseEntity.ok(DataRes.builder()
                 .status(HttpStatus.OK)
                 .code(200)
+                .success(true)
+                .message("Get user by id successfully")
                 .data(userService.findById(id))
                 .build());
     }
@@ -49,6 +55,8 @@ public class AdminUserController {
         return ResponseEntity.ok(DataRes.builder()
                 .status(HttpStatus.OK)
                 .code(200)
+                .success(true)
+                .message("Update user successfully")
                 .data(userService.update(id, req))
                 .build());
     }
@@ -59,7 +67,9 @@ public class AdminUserController {
         return ResponseEntity.ok(DataRes.builder()
                 .status(HttpStatus.OK)
                 .code(200)
-                .data("User deleted successfully")
+                .success(true)
+                .message("User deleted successfully")
+                .data(null)
                 .build());
     }
 }

@@ -19,6 +19,7 @@ import com.example.base_spring_boot.models.services.IRoleService;
 import com.example.base_spring_boot.security.jwt.JwtUtils;
 import com.example.base_spring_boot.security.principal.MyUserDetails;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -34,6 +35,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements IAuthService
@@ -143,6 +145,7 @@ public class AuthServiceImpl implements IAuthService
                 .build();
         
         passwordOtpRepository.save(passwordOtp);
+        log.info("--- FORGOT PASSWORD OTP FOR {}: {} ---", req.getEmail(), otp);
         mailService.sendOtpEmail(req.getEmail(), otp);
     }
 

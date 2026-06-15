@@ -21,6 +21,8 @@ public class UserController {
     public ResponseEntity<?> changePassword(@Valid @RequestBody ChangePasswordReq req) {
         userService.changePassword(req);
         return ResponseEntity.ok(DataRes.builder()
+                .status(org.springframework.http.HttpStatus.OK)
+                .code(200)
                 .success(true)
                 .message("Password changed successfully")
                 .data(null)

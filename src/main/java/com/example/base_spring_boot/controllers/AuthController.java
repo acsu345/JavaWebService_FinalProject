@@ -33,6 +33,8 @@ public class AuthController
     {
         return ResponseEntity.status(HttpStatus.OK).body(
                 DataRes.builder()
+                        .status(HttpStatus.OK)
+                        .code(200)
                         .success(true)
                         .message("Login successfully")
                         .data(authService.login(req))
@@ -50,6 +52,8 @@ public class AuthController
         authService.register(req);
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 DataRes.builder()
+                        .status(HttpStatus.CREATED)
+                        .code(201)
                         .success(true)
                         .message("Register successfully")
                         .data(null)
@@ -63,6 +67,8 @@ public class AuthController
         String refreshToken = req.get("refreshToken");
         return ResponseEntity.ok(
                 DataRes.builder()
+                        .status(HttpStatus.OK)
+                        .code(200)
                         .success(true)
                         .message("Token refreshed")
                         .data(authService.refreshToken(refreshToken))
@@ -79,6 +85,8 @@ public class AuthController
         }
         return ResponseEntity.ok(
                 DataRes.builder()
+                        .status(HttpStatus.OK)
+                        .code(200)
                         .success(true)
                         .message("Logout successfully")
                         .data(null)
@@ -90,6 +98,8 @@ public class AuthController
     public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordReq req) {
         authService.forgotPassword(req);
         return ResponseEntity.ok(DataRes.builder()
+                .status(HttpStatus.OK)
+                .code(200)
                 .success(true)
                 .message("OTP has been sent to your email")
                 .data(null)
@@ -100,6 +110,8 @@ public class AuthController
     public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordReq req) {
         authService.resetPassword(req);
         return ResponseEntity.ok(DataRes.builder()
+                .status(HttpStatus.OK)
+                .code(200)
                 .success(true)
                 .message("Password reset successfully")
                 .data(null)
